@@ -37,7 +37,7 @@ class BaggingClassifier:
         bootstrap: bool = True,
         oob_score: bool = True,
         n_jobs: int = -1,
-        random_state: Optional[int] = 42,
+        random_state: Optional[int] = 69,
     ) -> None:
         self.estimator_cls = estimator_cls
         self.estimator_kwargs = estimator_kwargs or {}
@@ -164,7 +164,7 @@ class RandomForestClassifier(BaggingClassifier):
         max_samples: Union[int, float] = 1.0,
         oob_score: bool = True,
         n_jobs: int = -1,
-        random_state: Optional[int] = 42,
+        random_state: Optional[int] = 69,
     ) -> None:
         self.criterion = criterion
         self.max_depth = max_depth
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     raw_df = load_data(data_path).head(10000)
     X, y, feature_names, _ = preprocess_data(raw_df, is_train=True)
     X_train, X_test, y_train, y_test = stratified_train_test_split(
-        X, y, test_size=0.20, random_state=42
+        X, y, test_size=0.20, random_state=69
     )
 
     rf = RandomForestClassifier(
@@ -271,7 +271,7 @@ if __name__ == "__main__":
         max_depth=8,
         min_samples_split=20,
         oob_score=True,
-        random_state=42,
+        random_state=69,
     )
     rf.fit(X_train, y_train)
     y_pred = rf.predict(X_test)

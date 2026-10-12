@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Effect of Ensemble Size (B) on Random Forest Performance}
+\label{tab:ensemble_size_convergence}
+\begin{tabular}{lcccccc}
+\toprule
+Trees (B) & OOB Accuracy & OOB Macro F1 & Test Accuracy & Test Macro F1 & Train Time (s) & Inference Time (s) \\
+\midrule
+5.0000 & 0.8029 & 0.4573 & 0.8120 & 0.4571 & 6.4600 & 1.8141 \\
+10.0000 & 0.8105 & 0.4671 & 0.8172 & 0.4644 & 15.2372 & 4.1187 \\
+20.0000 & 0.8138 & 0.4767 & 0.8174 & 0.4747 & 32.6723 & 8.0285 \\
+30.0000 & 0.8163 & 0.4840 & 0.8200 & 0.4982 & 48.8218 & 11.4604 \\
+50.0000 & 0.8164 & 0.4899 & 0.8184 & 0.4899 & 82.0441 & 19.2646 \\
+75.0000 & 0.8180 & 0.4837 & 0.8195 & 0.4955 & 123.0206 & 29.5553 \\
+\bottomrule
+\end{tabular}
+\end{table}

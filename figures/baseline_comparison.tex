@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\centering
+\caption{Baseline Comparison on UNSW-NB15 Cyberattack Dataset}
+\label{tab:baseline_comparison}
+\begin{tabular}{lccccccc}
+\toprule
+Model & Accuracy & Macro F1 & Macro Precision & Macro Recall & Weighted F1 & Train Time (s) & Inference Time (s) \\
+\midrule
+Decision Tree & 0.8097 & 0.5010 & 0.7263 & 0.4746 & 0.7786 & 5.6168 & 0.3076 \\
+k-NN (k=5) & 0.6513 & 0.3180 & 0.3338 & 0.3115 & 0.6426 & 0.0000 & 2.2945 \\
+Random Forest (B=30) & 0.8183 & 0.5062 & 0.8452 & 0.4816 & 0.7866 & 49.0406 & 11.0594 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -237,7 +237,7 @@ def cross_validate(
     X: np.ndarray,
     y: np.ndarray,
     n_splits: int = 5,
-    random_state: Optional[int] = 42,
+    random_state: Optional[int] = 69,
 ) -> Dict[str, Any]:
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
@@ -318,10 +318,10 @@ if __name__ == "__main__":
     raw_df = load_data(data_path).head(10000)
     X, y, feature_names, _ = preprocess_data(raw_df, is_train=True)
     X_train, X_test, y_train, y_test = stratified_train_test_split(
-        X, y, test_size=0.20, random_state=42
+        X, y, test_size=0.20, random_state=69
     )
 
-    dt = DecisionTreeClassifier(max_depth=8, min_samples_split=20, random_state=42)
+    dt = DecisionTreeClassifier(max_depth=8, min_samples_split=20, random_state=69)
     dt.fit(X_train, y_train)
     y_pred = dt.predict(X_test)
 

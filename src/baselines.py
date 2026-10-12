@@ -386,10 +386,10 @@ if __name__ == "__main__":
     raw_df = load_data(data_path).head(10000)
     X, y, feature_names, _ = preprocess_data(raw_df, is_train=True)
     X_train, X_test, y_train, y_test = stratified_train_test_split(
-        X, y, test_size=0.20, random_state=42
+        X, y, test_size=0.20, random_state=69
     )
 
-    dt = DecisionTreeClassifier(max_depth=8, min_samples_split=20, random_state=42)
+    dt = DecisionTreeClassifier(max_depth=8, min_samples_split=20, random_state=69)
     res = evaluate_baseline(dt, X_train, y_train, X_test, y_test)
     print(f"Decision Tree Acc: {res['accuracy']:.4f}, Macro F1: {res['macro_f1']:.4f}")
 

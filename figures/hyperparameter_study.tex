@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption{Hyperparameter Tuning & Subspace Feature Study for Random Forest}
+\label{tab:hyperparameter_study}
+\begin{tabular}{lcccc}
+\toprule
+Configuration & Test Accuracy & Test Macro F1 & OOB Accuracy & Train Time (s) \\
+\midrule
+Subspace: log2(D) & 0.8736 & 0.5174 & 0.8708 & 12.6267 \\
+Subspace: sqrt(D) [Default] & 0.8771 & 0.5288 & 0.8716 & 13.9026 \\
+Subspace: 0.5 * D & 0.8809 & 0.5549 & 0.8792 & 33.9107 \\
+Subspace: All D (Bagging) & 0.8787 & 0.5564 & 0.8784 & 61.8928 \\
+Depth: Shallow (d=8) & 0.8574 & 0.4581 & 0.8577 & 6.4219 \\
+Depth: Deep (d=16) & 0.8806 & 0.5415 & 0.8767 & 21.1273 \\
+Criterion: Entropy & 0.8754 & 0.5283 & 0.8735 & 16.0024 \\
+\bottomrule
+\end{tabular}
+\end{table}
