@@ -46,12 +46,12 @@ Thumbs.db
 models/
 
 # LaTeX
-report/*.aux
-report/*.bbl
-report/*.blg
-report/*.log
-report/*.out
-report/*.toc
-report/*.synctex.gz
-report/*.fls
-report/*.fdb_latexmk
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
