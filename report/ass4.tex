@@ -32,7 +32,7 @@
 \maketitle
 
 \begin{abstract}
-Automated network intrusion detection requires classification algorithms that can distinguish subtle cyberattacks from high-volume traffic with heavy class imbalances and high-dimensional spaces. This project examines ensemble learning through Breiman's random forest algorithm, evaluating its classification performance against standalone decision trees and $k$-nearest neighbours on the UNSW-NB15 benchmark. The random forest ensemble achieved an overall test accuracy of 81.93\% outperforming the single decision tree baseline of 80.97\% as well as the $k$-nearest neighbours baseline of 65.13\%. Out-of-bag accuracy tracked test generalization error within 0.37 percentage points at 30 trees (narrowing to within 0.20\% at larger ensemble sizes), confirming out-of-bag evaluation as a cost-free alternative to cross-validation. An ablation study showed that restricting split candidates to a random subspace of features reduced training wall-clock time by 77.5\% relative to full feature bagging while preserving some classification accuracy.
+Automated network intrusion detection requires classification algorithms capable of distinguishing subtle cyberattacks from high-volume traffic with heavy class imbalances and high-dimensional spaces. The study investigates ensemble learning through the random forest algorithm, evaluating multi-class classification performance against standalone decision trees and $k$-nearest neighbours on the UNSW-NB15 benchmark. The random forest ensemble achieved an overall test accuracy of 81.93\% outperforming the single decision tree baseline of 80.97\% as well as the $k$-nearest neighbours baseline of 65.13\%. Out-of-bag accuracy tracked test generalization error within 0.37 percentage points at 30 trees (narrowing to within 0.20\% at larger ensemble sizes), confirming out-of-bag evaluation as a cost-free alternative to cross-validation. An ablation study showed that restricting split candidates to a random subspace of features reduced training wall-clock time by 77.5\% relative to full feature bagging while preserving classification accuracy.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -43,27 +43,27 @@ Network intrusion detection, random forest, bootstrap aggregation, random subspa
 
 Real network data comes with several problems. Normal traffic heavily outnumbers attacks, feature values vary widely in size, and attacks change often. Machine learning models must learn to detect attacks accurately while keeping false positives low.
 
-Single models can have disadvantages, the $k$-nearest neighbours algorithm saves all work for test time. Calculating the distance to every stored record takes too long on large datasets. Single decision trees create clear rules, but suffer from high variance. Small changes in the training data change the top splits and ruin the rest of the tree.
+Individual baseline models exhibit distinct disadvantages. The $k$-nearest neighbours algorithm saves all work for test time. Calculating the distance to every stored record requires excessive computational time on large datasets. Single decision trees create clear rules, but suffer from high variance. Small changes in the training data change the top splits and ruin the remaining subtrees.
 
-Ensemble learning fixes these weaknesses by combining predictions from multiple models. Bootstrap aggregation reduces variance by training trees on random samples of the data. The random subspace method makes the trees different by choosing from a random subset of features at each split. Combining these two ideas gives Breiman's random forest algorithm \cite{breiman2001}.
+Ensemble learning fixes these weaknesses by combining predictions from multiple models. Bootstrap aggregation reduces variance by training trees on random samples of the data. The random subspace method makes the trees different by choosing from a random subset of features at each split. Combining these principles yields the random forest ensemble method developed by Breiman \cite{breiman2001}.
 
 \section{Background}
 
-This section reviews the theory behind the machine learning models and looks at data quality problems in the UNSW-NB15 dataset \cite{moustafa2015}.
+Section~II reviews the theoretical foundations of the evaluated classification models and examines data quality challenges in the benchmark dataset. Subsection~II-A presents the nearest neighbours and decision tree baselines. Subsection~II-B details bootstrap aggregation and the random subspace method. Subsection~II-C discusses data quality issues within the UNSW-NB15 network intrusion benchmark \cite{moustafa2015}.
 
 \subsection{Baseline Classifiers: Nearest Neighbours and Decision Trees}
 
-The $k$-nearest neighbours algorithm is a simple learning method introduced by Cover and Hart \cite{cover1967}. The algorithm stores all training points with their feature values $\mathbf{x}_i \in \mathbb{R}^D$ and labels $y_i \in \{0, \dots, C-1\}$. The algorithm does not train beforehand. For a new test point $\mathbf{x}_q$, the algorithm calculates the Euclidean distance to every training point. The test point then receives the most common class among its $k$ closest neighbours. Scanning every training point takes $O(N \cdot D)$ time, which makes test predictions slow on large datasets. Also, in high dimensions, distances between points become very similar. Irrelevant features add noise to the distance, making neighbour choices less reliable.
+The $k$-nearest neighbours algorithm is a simple learning method introduced by Cover and Hart \cite{cover1967}. The algorithm stores all training points with associated feature values $\mathbf{x}_i \in \mathbb{R}^D$ and labels $y_i \in \{0, \dots, C-1\}$. The algorithm does not train beforehand. For a new test point $\mathbf{x}_q$, the algorithm calculates the Euclidean distance to every training point. The test point then receives the most common class among the $k$ closest neighbours. Scanning every training point takes $O(N \cdot D)$ time, resulting in high test latency on large datasets. Also, in high dimensions, distances between points become very similar. Irrelevant features add noise to the distance, making neighbour choices less reliable.
 
 Classification and regression trees split the feature space into rectangular regions using simple rules, as described by Breiman \textit{et al.} \cite{breiman1984}. At each node, the tree tests features and split points to find the choice that best separates the classes. The quality of a split is measured by impurity. Gini impurity is defined as:
 \begin{equation}
 I_G(S) = 1 - \sum_{c=0}^{C-1} p_c^2 ,
 \end{equation}
-where $p_c$ is the fraction of records belonging to class $c$ in node subset $S$. Gini impurity measures the chance that a randomly picked point is given the wrong label based on class counts in the node. A pure node with only one class has a Gini impurity of zero. Decision trees are fast during testing. However, a single decision tree has high variance. An early bad split cannot be undone and hurts the entire tree below it.
+where $p_c$ is the fraction of records belonging to class $c$ in node subset $S$. Gini impurity measures the chance that a randomly picked point is given the wrong label based on class counts in the node. A pure node with only one class has a Gini impurity of zero. Decision trees are fast during testing. However, a single decision tree has high variance. An early bad split cannot be undone and hurts all descendant subtrees.
 
 \subsection{Ensemble Learning: Bootstrap Aggregation and Random Forests}
 
-Bootstrap aggregation, introduced by Breiman \cite{breiman1996}, lowers variance by averaging models. Given a training set of $N$ rows, the method creates $B$ new datasets by drawing $N$ rows with replacement. In any single sample, a training row has a chance of $(1 - 1/N)^N \approx e^{-1} \approx 0.368$ of being left out. This means about 36.8\% of the rows are not used to train that tree. These unused rows form the out-of-bag set for that tree.
+Bootstrap aggregation, introduced by Breiman \cite{breiman1996}, lowers variance by averaging models. Given a training set of $N$ rows, the method creates $B$ new datasets by drawing $N$ rows with replacement. In any single sample, a training row has a chance of $(1 - 1/N)^N \approx e^{-1} \approx 0.368$ of being left out. Consequently, approximately 36.8\% of the training rows remain unselected for each estimator. These unused rows form the out-of-bag set for that tree.
 
 By averaging predictions from only the trees where a row was left out, out-of-bag validation estimates test error without a separate validation split. Breiman \cite{breiman1996} showed that out-of-bag error provides an unbiased estimate of generalization error.
 
@@ -71,9 +71,9 @@ Simple bagging has a limit. If a few features are very strong, every tree picks 
 \begin{equation}
 \mathrm{Var}(\bar{h}) = \rho \sigma^2 + \frac{1 - \rho}{B} \sigma^2 .
 \end{equation}
-As the number of trees $B$ grows, the second term drops to zero. However, the first term $\rho \sigma^2$ remains. If the trees are strongly correlated, averaging cannot eliminate this remaining variance.
+As the number of trees $B$ grows, the second term drops to zero. However, the first term $\rho \sigma^2$ remains. If the trees are strongly correlated, averaging cannot eliminate the residual correlation variance.
 
-The random subspace method, introduced by Ho \cite{ho1998} and used in random forests by Breiman \cite{breiman2001}, solves this issue. Instead of checking all $D$ features at each split, the tree checks only a random subset of $m \le D$ features, usually setting $m = \lfloor \sqrt{D} \rfloor$. Forcing trees to consider different features lowers the correlation $\rho$ between trees. Lower correlation reduces the total variance of the forest.
+The random subspace method, introduced by Ho \cite{ho1998} and used in random forests by Breiman \cite{breiman2001}, resolves tree correlation. Instead of checking all $D$ features at each split, the tree checks only a random subset of $m \le D$ features, usually setting $m = \lfloor \sqrt{D} \rfloor$. Forcing trees to consider different features lowers the correlation $\rho$ between trees. Lower correlation reduces the total variance of the forest.
 
 \subsection{Data Quality Issues}
 
@@ -85,25 +85,25 @@ Several features are strongly correlated, such as packet counts and byte counts.
 
 Numerical features have very different ranges. Total byte counts reach millions, while connection durations take fractions of a second. The $k$-nearest neighbours algorithm requires min-max scaling so large values do not dominate distances. In contrast, decision trees and random forests only care about feature order. Changing the scale of a feature does not change tree splits.
 
-Nominal features such as network protocols have many categories. Creating binary dummy variables for every protocol increases the number of columns, which hurts distance calculations in $k$-nearest neighbours. Integer encoding keeps the feature count small and works well for tree splits.
+Nominal features such as network protocols have many categories. Creating binary dummy variables for every protocol increases the number of columns, diminishing the effectiveness of distance calculations in $k$-nearest neighbours. Integer encoding keeps the feature count small and works well for tree splits.
 
-The dataset includes an arbitrary record identifier \texttt{id}. If left in the data, a decision tree can memorize each row by splitting on this identifier, causing severe overfitting. Removing the identifier avoids this problem.
+The dataset includes an arbitrary record identifier \texttt{id}. If retained in the data, a decision tree memorizes individual records by splitting on the observation identifier, causing severe overfitting. Removing the identifier prevents artificial memorization.
 
-The classes are heavily unbalanced. Normal traffic contains 93\,000 rows, while the rarest attack has only 174 rows. In $k$-nearest neighbours, the common classes easily outvote rare attacks. In random forests, random samples may leave out rare attacks. Macro-averaged metrics give equal weight to every class to show how well each attack type is detected.
+The classes are heavily unbalanced. Normal traffic contains 93\,000 rows, while the rarest attack has only 174 rows. In $k$-nearest neighbours, the common classes easily outvote rare attacks. In random forests, random bootstrap draws frequently omit rare attacks. Macro-averaged metrics give equal weight to every class to show how well each attack type is detected.
 
 \section{Implementation}
 
-This section details the preprocessing pipeline and the custom machine learning algorithms developed from scratch for this study.
+Section~III details the software pipeline developed from scratch in pure NumPy for the empirical evaluation. Subsection~III-A describes the data transformation and cleaning procedures. Subsection~III-B details the standalone implementations of the tree and ensemble classification algorithms.
 
 \subsection{Data Preprocessing and Transformation Pipeline}
 
 The data preparation pipeline converts raw network records into numerical arrays. All transformers were fitted only on the training set to avoid data leakage.
 
-The record identifier \texttt{id} was dropped first. Missing values in \texttt{service} marked with \texttt{'?'} were replaced with the word \texttt{'unknown'}. This kept all 257\,673 rows.
+The record identifier \texttt{id} was dropped first. Missing values in \texttt{service} marked with \texttt{'?'} were replaced with the word \texttt{'unknown'}. Imputing missing values preserved all 257\,673 records.
 
 The categorical features \texttt{proto}, \texttt{service}, and \texttt{state} were converted into integers. Rare protocols appearing in fewer than 0.1\% of records were grouped into an \texttt{'other'} category. The final dataset has 42 descriptive features: 39 numerical counters and three integer-encoded categories.
 
-For $k$-nearest neighbours, all numerical features were scaled to the range $[0, 1]$ using min-max scaling based on training minimums and maximums. Decision trees and random forests used unscaled data directly.
+For $k$-nearest neighbours, all numerical features were scaled to the range $[0, 1]$ using min-max scaling based on training minima and maxima. Decision trees and random forests used unscaled data directly.
 
 \subsection{Custom Machine Learning Algorithms}
 
@@ -117,7 +117,7 @@ Feature importance was calculated using mean decrease in impurity. For every spl
 
 \section{Empirical Process}
 
-This section describes the experimental design, hyperparameter selection, evaluation metrics, and analysis framework.
+Section~IV outlines the empirical methodology applied to evaluate classifier behavior. Subsection~IV-A explains the stratified data partitioning scheme. Subsection~IV-B details the hyperparameter search spaces and control parameters.
 
 \subsection{Data Partitioning}
 
@@ -129,9 +129,23 @@ Hyperparameters were chosen based on preliminary tests. For the single decision 
 
 For the random forest, ensemble size was tested across $B \in \{5, 10, 20, 30, 50, 75\}$, with tree depth 12, minimum split size 20, and $m = \lfloor \sqrt{42} \rfloor = 6$. The hyperparameter study compared feature counts $m \in \{5, 6, 21, 42\}$, tree depths of eight, 12, and 16, and Gini impurity versus entropy.
 
+\section{Results and Discussion}
+
+Section~V presents and discusses the empirical findings. Subsection~V-A evaluates the baseline classifiers against the random forest ensemble. Subsection~V-B analyzes ensemble convergence and out-of-bag validation accuracy across forest sizes. Subsection~V-C presents the hyperparameter ablation study. Subsection~V-D examines feature importances, and Subsection~V-E discusses minority class failure modes.
+
+\subsection{Baseline Model Comparison}
+
+Table~\ref{tab:baseline_comparison} compares the single decision tree, $k$-nearest neighbours, and the random forest.
+
+The random forest achieved the best overall accuracy at 81.93\% and a macro precision of 79.62\%. The single decision tree achieved 80.97\% accuracy and 72.63\% macro precision. The random forest improved macro precision by nearly 7.0 percentage points over the single tree. Averaging predictions across trees helps remove false alarms, a vital property for reliable intrusion detection.
+
+The $k$-nearest neighbours baseline performed poorly, with only 65.13\% accuracy and 0.3180 macro F1. In 42 dimensions, distances between points become very close together. Irrelevant features add noise to the distance, thereby misleading distance calculations.
+
+Looking at speed, $k$-nearest neighbours requires no training, but took 3.36 seconds to classify 3\,000 test rows against 15\,000 training points (1.12 milliseconds per row). The random forest took 113.62 seconds to train 30 trees, but classified all 51\,534 test rows in 20.22 seconds. That is under 0.4 milliseconds per row, enabling real-time network traffic classification.
+
 \begin{table*}[t]
 \centering
-\caption{Baseline Model Comparison on UNSW-NB15 Cyberattack Dataset}
+\caption{Baseline Model Comparison on Benchmark Cyberattack Dataset}
 \label{tab:baseline_comparison}
 \setlength{\tabcolsep}{6pt}
 \small
@@ -146,33 +160,14 @@ Random Forest ($B=30$, $m=6$) & 0.8193 & 0.4829 & 0.7962 & 0.4679 & 113.62 & 20.
 \end{tabular}
 \end{table*}
 
-\begin{figure}[t]
+Figure~\ref{fig:confusion_matrix} shows the confusion matrix for the random forest. The model is very accurate on common classes: 95.4\% on normal traffic, 97.5\% on generic attacks, and 95.2\% on exploits. In contrast, fuzzers achieve 46.0\% recall, with 40.0\% misclassified as normal traffic and 13.1\% as exploits, because automated fuzzing sequences generate varied packet lengths and header configurations that closely mimic benign browsing sessions and exploit probes.
+
+\begin{figure}[b]
 \centering
 \includegraphics[width=\columnwidth]{cm_random_forest_b_30.pdf}
 \caption{Multi-Class Confusion Matrix for Random Forest Ensemble ($B=30$)}
 \label{fig:confusion_matrix}
 \end{figure}
-
-\section{Results and Discussion}
-
-\subsection{Baseline Model Comparison}
-
-Table~\ref{tab:baseline_comparison} compares the single decision tree, $k$-nearest neighbours, and the random forest.
-
-The random forest achieved the best overall accuracy at 81.93\% and a macro precision of 79.62\%. The single decision tree achieved 80.97\% accuracy and 72.63\% macro precision. The random forest improved macro precision by nearly 7.0 percentage points over the single tree. Averaging predictions across trees helps remove false alarms, which is critical for intrusion detection.
-
-The $k$-nearest neighbours baseline performed poorly, with only 65.13\% accuracy and 0.3180 macro F1. In 42 dimensions, distances between points become very close together. Irrelevant features add noise to the distance, which misleads the model.
-
-Looking at speed, $k$-nearest neighbours requires no training, but took 3.36 seconds to classify 3\,000 test rows against 15\,000 training points (1.12 milliseconds per row). The random forest took 113.62 seconds to train 30 trees, but classified all 51\,534 test rows in 20.22 seconds. That is under 0.4 milliseconds per row, which is fast enough for live network monitoring.
-
-Figure~\ref{fig:confusion_matrix} shows the confusion matrix for the random forest. The model is very accurate on common classes: 95.4\% on normal traffic, 97.5\% on generic attacks, and 95.2\% on exploits. In contrast, fuzzers achieve 46.0\% recall, with 40.0\% misclassified as normal traffic and 13.1\% as exploits, because automated fuzzing sequences generate varied packet lengths and header configurations that closely mimic benign browsing sessions and exploit probes.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.90\textwidth]{ensemble_size_convergence.pdf}
-\caption{Convergence of Out-of-Bag and Test Accuracy Alongside Computational Training Duration Across Estimator Counts ($B$)}
-\label{fig:ensemble_convergence}
-\end{figure*}
 
 \subsection{Ensemble Size Convergence and Out-of-Bag Validation}
 
@@ -181,6 +176,23 @@ Figure~\ref{fig:ensemble_convergence} shows how accuracy and training time chang
 Test accuracy improved rapidly from 81.20\% at five trees to 82.00\% at 30 trees. Adding more trees after 30 gave almost no improvement; 75 trees reached 81.95\% accuracy. Training time grew in a straight line, rising from 6.46 seconds at five trees to 48.82 seconds at 30 trees, and 123.02 seconds at 75 trees. Therefore, 30 trees is the best practical choice, giving top accuracy while keeping training time under 50 seconds.
 
 Figure~\ref{fig:ensemble_convergence} also shows that out-of-bag accuracy closely tracked test accuracy throughout ensemble growth. At 30 trees, out-of-bag accuracy was 81.63\%, within 0.37 percentage points of the test accuracy of 82.00\% (and narrowing to within 0.20\% at 50 trees and beyond). Because about 36.8\% of rows are left out of each tree, out-of-bag scores provide an accurate estimate of test error without running cross-validation.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.90\textwidth]{ensemble_size_convergence.pdf}
+\caption{Convergence of Out-of-Bag and Test Accuracy Alongside Computational Training Duration Across Estimator Counts ($B$)}
+\label{fig:ensemble_convergence}
+\end{figure*}
+
+\subsection{Hyperparameter Tuning and Subspace Ablation}
+
+Table~\ref{tab:hyperparameter_study} presents the results of changing feature counts, tree depths, and split rules.
+
+The number of features tested at each split had a major impact on training speed. Using all 42 features (full bagging) took 61.89 seconds and reached 87.87\% accuracy. Testing only six random features per split ($m = \lfloor \sqrt{D} \rfloor$) took only 13.90 seconds and reached 87.71\% accuracy. Testing fewer features cut training time by 77.5\% while losing almost no accuracy. Testing only five features ($m = \lfloor \log_2 D \rfloor$) was slightly worse, with 87.36\% accuracy, because too few good features were available at each split.
+
+Tree depth also mattered. Shallow trees of depth eight stopped at 85.74\% accuracy and 0.4581 macro F1, because short trees cannot capture complex attack patterns. Deeper trees of depth 16 reached 88.06\% accuracy and 0.5415 macro F1.
+
+Comparing split rules showed that Gini impurity and entropy gave nearly identical accuracy (87.71\% versus 87.54\%). However, Gini impurity trained 13.1\% faster because Gini calculations use quadratic arithmetic rather than logarithmic operations.
 
 \begin{table}[t]
 \centering
@@ -203,16 +215,6 @@ Criterion: Entropy ($d=12$) & 0.8754 & 0.5283 & 0.8735 & 16.00 \\
 \end{tabular}
 \end{table}
 
-\subsection{Hyperparameter Tuning and Subspace Ablation}
-
-Table~\ref{tab:hyperparameter_study} presents the results of changing feature counts, tree depths, and split rules.
-
-The number of features tested at each split had a major impact on training speed. Using all 42 features (full bagging) took 61.89 seconds and reached 87.87\% accuracy. Testing only six random features per split ($m = \lfloor \sqrt{D} \rfloor$) took only 13.90 seconds and reached 87.71\% accuracy. Testing fewer features cut training time by 77.5\% while losing almost no accuracy. Testing only five features ($m = \lfloor \log_2 D \rfloor$) was slightly worse, with 87.36\% accuracy, because too few good features were available at each split.
-
-Tree depth also mattered. Shallow trees of depth eight stopped at 85.74\% accuracy and 0.4581 macro F1, because short trees cannot capture complex attack patterns. Deeper trees of depth 16 reached 88.06\% accuracy and 0.5415 macro F1.
-
-Comparing split rules showed that Gini impurity and entropy gave nearly identical accuracy (87.71\% versus 87.54\%). However, Gini impurity trained 13.1\% faster because it uses simple math instead of logarithms.
-
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\columnwidth]{feature_importances_random_forest_b_30.pdf}
@@ -226,20 +228,20 @@ Figure~\ref{fig:feature_importance} shows the 15 most important features ranked 
 
 The top features were network service protocol (\texttt{service}, 0.1234), source time-to-live (\texttt{sttl}, 0.1075), destination port connection count (\texttt{ct\_dst\_sport\_ltm}, 0.0859), source byte volume (\texttt{sbytes}, 0.0680), and state time-to-live ratio (\texttt{ct\_state\_ttl}, 0.0670).
 
-These features match real attack behavior. Service identification isolates standard application protocols from attack vectors. Source time-to-live reveals the sender operating system and flags spoofed IP packets that travel anomalous hop counts. Connection count features (\texttt{ct\_}) detect rapid port scans and denial-of-service bursts, while byte counters distinguish data transfers and payload injections from lightweight administrative traffic.
+These features match real attack behavior. Service identification isolates standard application protocols from attack vectors. Source time-to-live reveals the sender operating system and flags spoofed Internet Protocol (IP) packets that travel anomalous hop counts. Connection count features (\texttt{ct\_}) detect rapid port scans and denial-of-service bursts, while byte counters distinguish data transfers and payload injections from lightweight administrative traffic.
 
 \subsection{Failure Modes and Minority Class Analysis}
 
 Although overall accuracy was 81.93\%, rare attack classes had lower scores. In the dataset, normal traffic has 93\,000 rows, while worms has only 174 rows and backdoors has 2\,329 rows.
 
-Random bootstrap samples often miss rows from rare attack classes. As a result, individual trees rarely create leaves for rare attacks, and the tree favors the majority classes. In Figure~\ref{fig:confusion_matrix}, rare attacks were overwhelmingly misclassified as exploits rather than normal traffic: worms suffered 97.1\% misclassification as exploits (achieving 2.9\% recall), DoS had 92.2\% misclassified as exploits (2.8\% recall), and backdoors had 91.4\% misclassified as exploits (5.2\% recall). Because exploits form a large, diverse attack class, anomalous patterns without distinct minority branches default to exploits. In real systems, training with balanced samples or synthetic examples can help the trees learn rare attacks better.
+Random bootstrap samples often miss rows from rare attack classes. As a result, individual trees rarely create leaves for rare attacks, and the tree favors the majority classes. In Figure~\ref{fig:confusion_matrix}, rare attacks were overwhelmingly misclassified as exploits rather than normal traffic: worms suffered 97.1\% misclassification as exploits (achieving 2.9\% recall), denial-of-service (DoS) traffic had 92.2\% misclassified as exploits (2.8\% recall), and backdoors had 91.4\% misclassified as exploits (5.2\% recall). Because exploits form a large, diverse attack class, anomalous patterns without distinct minority branches default to exploits. In real systems, training with balanced samples or synthetic minority examples enables decision trees to better learn rare attack patterns.
 
 \balance
 \section{Conclusions}
 
-This project evaluated Breiman's random forest algorithm for network intrusion detection on the UNSW-NB15 dataset, comparing results to a single decision tree and $k$-nearest neighbours.
+The study evaluated the random forest algorithm of Breiman \cite{breiman2001} for network intrusion detection on the UNSW-NB15 dataset, comparing results to a single decision tree and $k$-nearest neighbours.
 
-The random forest performed best, achieving 81.93\% accuracy and 79.62\% macro precision. It beat the single decision tree (80.97\% accuracy and 72.63\% macro precision) and the $k$-nearest neighbours model (65.13\% accuracy). Test accuracy leveled off at 30 trees, while out-of-bag accuracy matched test accuracy within 0.37\% at 30 trees and within 0.20\% for larger ensembles. Picking six random features per split reduced training time by 77.5\% compared to full bagging, with virtually no drop in accuracy.
+The random forest performed best, achieving 81.93\% accuracy and 79.62\% macro precision. The ensemble outperformed the single decision tree (80.97\% accuracy and 72.63\% macro precision) and the $k$-nearest neighbours model (65.13\% accuracy). Test accuracy leveled off at 30 trees, while out-of-bag accuracy matched test accuracy within 0.37\% at 30 trees and within 0.20\% for larger ensembles. Picking six random features per split reduced training time by 77.5\% compared to full bagging, with virtually no drop in accuracy.
 
 \begin{thebibliography}{00}
 \setlength{\itemsep}{2.0pt}
