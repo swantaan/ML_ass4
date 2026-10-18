@@ -105,19 +105,30 @@ def run_hyperparameter_study(quick: bool = False) -> pd.DataFrame:
     )
 
     src.set_plot_style()
-    fig, ax = plt.subplots(figsize=(9, 4.5))
+    fig, ax = plt.subplots(figsize=(3.5, 2.7))
     y_pos = np.arange(len(df_results))
-    ax.barh(y_pos, df_results["Test Macro F1"], color="#2b5c8f", edgecolor="#111111", linewidth=0.6)
+    ax.barh(y_pos, df_results["Test Macro F1"], color="#2b5c8f", edgecolor="#111111", linewidth=0.5, height=0.68)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(df_results["Configuration"])
-    ax.set_xlabel("Test Macro F1-Score", fontweight="bold")
-    ax.set_title("Hyperparameter Configuration Comparison (Macro F1)", fontweight="bold")
+
+    clean_labels = [
+        r"Subspace: $\log_2 D$ ($m=5$)",
+        r"Subspace: $\sqrt{D}$ ($m=6$, default)",
+        r"Subspace: $0.5D$ ($m=21$)",
+        r"Subspace: $D$ ($m=42$, bagging)",
+        r"Depth: Shallow ($d=8$)",
+        r"Depth: Deep ($d=16$)",
+        r"Criterion: Entropy ($d=12$)",
+    ]
+    ax.set_yticklabels(clean_labels if len(clean_labels) == len(df_results) else df_results["Configuration"], fontsize=8.5)
+    ax.set_xlabel("Test Macro F1-Score", fontweight="bold", fontsize=9.5)
+    ax.set_title("Subspace & Depth Comparison", fontweight="bold", fontsize=10.0)
+    ax.set_xlim(0, 0.68)
     ax.grid(axis="x", linestyle="--", alpha=0.6)
 
     for idx, val in enumerate(df_results["Test Macro F1"]):
-        ax.text(val + 0.002, idx, f"{val:.4f}", va="center", fontsize=8)
+        ax.text(val + 0.008, idx, f"{val:.4f}", va="center", fontsize=8.5, family="serif")
 
-    plt.tight_layout()
+    plt.tight_layout(pad=0.4)
     src.save_figure(fig, os.path.join(fig_dir, "hyperparameter_study.png"))
     src.save_figure(fig, os.path.join(fig_dir, "hyperparameter_study.pdf"))
 

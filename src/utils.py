@@ -20,19 +20,26 @@ from src.data_preprocessing import ATTACK_CATEGORY_MAP
 
 
 def set_plot_style() -> None:
-    plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Helvetica", "Arial"]
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = [
+        "Times New Roman",
+        "Nimbus Roman",
+        "Liberation Serif",
+        "DejaVu Serif",
+    ]
+    plt.rcParams["mathtext.fontset"] = "stix"
     plt.rcParams["axes.edgecolor"] = "#333333"
     plt.rcParams["axes.linewidth"] = 0.8
     plt.rcParams["grid.color"] = "#dddddd"
     plt.rcParams["grid.linestyle"] = "--"
     plt.rcParams["grid.alpha"] = 0.7
     plt.rcParams["font.size"] = 10
-    plt.rcParams["axes.titlesize"] = 11
+    plt.rcParams["axes.titlesize"] = 10.5
     plt.rcParams["axes.labelsize"] = 10
-    plt.rcParams["xtick.labelsize"] = 9
-    plt.rcParams["ytick.labelsize"] = 9
-    plt.rcParams["legend.fontsize"] = 9
-    plt.rcParams["figure.titlesize"] = 12
+    plt.rcParams["xtick.labelsize"] = 9.5
+    plt.rcParams["ytick.labelsize"] = 9.5
+    plt.rcParams["legend.fontsize"] = 9.5
+    plt.rcParams["figure.titlesize"] = 11
 
 
 def save_figure(fig: plt.Figure, filepath: str, dpi: int = 300) -> str:
@@ -55,8 +62,15 @@ def plot_confusion_matrix(
     set_plot_style()
     n_classes = cm.shape[0]
 
+    short_defaults = [
+        "Normal", "Recon", "Backdoor", "DoS", "Exploits",
+        "Analysis", "Fuzzers", "Worms", "Shellcode", "Generic"
+    ]
     if class_names is None:
-        class_names = [ATTACK_CATEGORY_MAP.get(i, f"Class {i}") for i in range(n_classes)]
+        if n_classes == 10:
+            class_names = short_defaults
+        else:
+            class_names = [ATTACK_CATEGORY_MAP.get(i, f"Class {i}") for i in range(n_classes)]
 
     if normalize:
         row_sums = cm.sum(axis=1, keepdims=True)
@@ -65,32 +79,43 @@ def plot_confusion_matrix(
             row_sums,
             out=np.zeros_like(cm, dtype=np.float32),
             where=row_sums != 0,
-        )
-        fmt = ".2%"
+        ) * 100.0
     else:
-        display_data = cm
-        fmt = "d"
+        display_data = cm.astype(np.float32)
 
-    fig, ax = plt.subplots(figsize=(8, 6.5))
+    fig, ax = plt.subplots(figsize=(3.5, 3.3))
+    annot_labels = np.empty_like(display_data, dtype=object)
+    for i in range(n_classes):
+        for j in range(n_classes):
+            val = display_data[i, j]
+            if val >= 1.0:
+                annot_labels[i, j] = f"{val:.1f}"
+            elif val > 0.0:
+                annot_labels[i, j] = f"{val:.1f}"
+            else:
+                annot_labels[i, j] = "0"
+
     sns.heatmap(
         display_data,
-        annot=True,
-        fmt=fmt,
+        annot=annot_labels,
+        fmt="",
         cmap=cmap,
         xticklabels=class_names,
         yticklabels=class_names,
         cbar=True,
-        linewidths=0.5,
-        linecolor="#cccccc",
+        cbar_kws={"shrink": 0.82, "label": "Recall (%)"},
+        linewidths=0.3,
+        linecolor="#dddddd",
+        annot_kws={"size": 6.8, "family": "serif"},
         ax=ax,
     )
 
-    ax.set_title(title, fontweight="bold", pad=12)
-    ax.set_xlabel("Predicted Label", fontweight="bold", labelpad=8)
-    ax.set_ylabel("True Label", fontweight="bold", labelpad=8)
-    plt.xticks(rotation=40, ha="right")
+    ax.set_xlabel("Predicted Label", fontweight="bold", fontsize=9.5, labelpad=4)
+    ax.set_ylabel("True Label", fontweight="bold", fontsize=9.5, labelpad=4)
+    ax.tick_params(axis="both", labelsize=8)
+    plt.xticks(rotation=45, ha="right")
     plt.yticks(rotation=0)
-    plt.tight_layout()
+    plt.tight_layout(pad=0.3)
 
     if filepath:
         save_figure(fig, filepath)
@@ -101,8 +126,8 @@ def plot_confusion_matrix(
 def plot_feature_importances(
     feature_names: Sequence[str],
     importances: np.ndarray,
-    top_n: int = 20,
-    title: str = "Feature Importances (Gini MDI)",
+    top_n: int = 15,
+    title: str = "Top 15 Predictive Features (MDI)",
     color: str = "#2b5c8f",
     filepath: Optional[str] = None,
 ) -> plt.Figure:
@@ -111,20 +136,21 @@ def plot_feature_importances(
     top_names = [feature_names[i] for i in order][::-1]
     top_scores = importances[order][::-1]
 
-    fig, ax = plt.subplots(figsize=(7.5, max(4.5, top_n * 0.28)))
+    fig, ax = plt.subplots(figsize=(3.5, 3.7))
     y_pos = np.arange(len(top_names))
-    ax.barh(y_pos, top_scores, color=color, edgecolor="#111111", linewidth=0.6)
+    ax.barh(y_pos, top_scores, color=color, edgecolor="#111111", linewidth=0.5, height=0.68)
 
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(top_names)
-    ax.set_xlabel("Relative Importance (MDI)", fontweight="bold")
-    ax.set_title(title, fontweight="bold", pad=10)
+    ax.set_yticklabels(top_names, fontsize=8.5)
+    ax.set_xlabel("Relative Importance (MDI)", fontweight="bold", fontsize=9.5)
+    ax.set_title(title, fontweight="bold", fontsize=10.0)
+    ax.set_xlim(0, max(top_scores) * 1.25)
     ax.grid(axis="x", linestyle="--", alpha=0.6)
 
     for idx, val in enumerate(top_scores):
-        ax.text(val + 0.001, idx, f"{val:.4f}", va="center", fontsize=8)
+        ax.text(val + 0.002, idx, f"{val:.4f}", va="center", fontsize=8.0, family="serif")
 
-    plt.tight_layout()
+    plt.tight_layout(pad=0.4)
 
     if filepath:
         save_figure(fig, filepath)

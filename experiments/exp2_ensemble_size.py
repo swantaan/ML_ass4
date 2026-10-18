@@ -100,7 +100,7 @@ def run_ensemble_size_convergence(quick: bool = False) -> pd.DataFrame:
     )
 
     src.set_plot_style()
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.2))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.65))
 
     ax1.plot(
         df_results["Trees (B)"],
@@ -108,7 +108,8 @@ def run_ensemble_size_convergence(quick: bool = False) -> pd.DataFrame:
         marker="o",
         label="OOB Accuracy",
         color="#1f77b4",
-        linewidth=1.8,
+        linewidth=2.0,
+        markersize=5.5,
     )
     ax1.plot(
         df_results["Trees (B)"],
@@ -117,12 +118,13 @@ def run_ensemble_size_convergence(quick: bool = False) -> pd.DataFrame:
         label="Test Accuracy",
         color="#ff7f0e",
         linestyle="--",
-        linewidth=1.8,
+        linewidth=2.0,
+        markersize=5.5,
     )
-    ax1.set_xlabel("Number of Estimators (B)", fontweight="bold")
-    ax1.set_ylabel("Accuracy", fontweight="bold")
-    ax1.set_title("OOB vs Test Accuracy Convergence", fontweight="bold")
-    ax1.legend(loc="lower right")
+    ax1.set_xlabel(r"Number of Estimators ($B$)", fontweight="bold", fontsize=10)
+    ax1.set_ylabel("Classification Accuracy", fontweight="bold", fontsize=10)
+    ax1.set_title("OOB vs. Test Accuracy Convergence", fontweight="bold", fontsize=10.5)
+    ax1.legend(loc="lower right", fontsize=9.5, framealpha=0.9)
     ax1.grid(True, linestyle="--", alpha=0.6)
 
     ax2.plot(
@@ -131,14 +133,15 @@ def run_ensemble_size_convergence(quick: bool = False) -> pd.DataFrame:
         marker="^",
         label="Training Wall Time",
         color="#2ca02c",
-        linewidth=1.8,
+        linewidth=2.0,
+        markersize=5.5,
     )
-    ax2.set_xlabel("Number of Estimators (B)", fontweight="bold")
-    ax2.set_ylabel("Training Time (seconds)", fontweight="bold")
-    ax2.set_title("Computational Cost Scaling", fontweight="bold")
+    ax2.set_xlabel(r"Number of Estimators ($B$)", fontweight="bold", fontsize=10)
+    ax2.set_ylabel("Training Duration (seconds)", fontweight="bold", fontsize=10)
+    ax2.set_title("Computational Cost Scaling", fontweight="bold", fontsize=10.5)
     ax2.grid(True, linestyle="--", alpha=0.6)
 
-    plt.tight_layout()
+    plt.tight_layout(pad=0.5)
     src.save_figure(fig, os.path.join(fig_dir, "ensemble_size_convergence.png"))
     src.save_figure(fig, os.path.join(fig_dir, "ensemble_size_convergence.pdf"))
 
