@@ -148,7 +148,7 @@ Random Forest ($B=30$, $m=6$) & 0.8193 & 0.4829 & 0.7962 & 0.4679 & 113.62 & 20.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\columnwidth]{cm_random_forest_b_30.pdf}
+\includegraphics[width=\columnwidth]{cm_random_forest_b_30.pdf}
 \caption{Multi-Class Confusion Matrix for Random Forest Ensemble ($B=30$)}
 \label{fig:confusion_matrix}
 \end{figure}
@@ -167,12 +167,12 @@ Looking at speed, $k$-nearest neighbours requires no training, but took 3.36 sec
 
 Figure~\ref{fig:confusion_matrix} shows the confusion matrix for the random forest. The model is very accurate on common classes: 92.4\% on normal traffic, 96.8\% on generic attacks, and 74.2\% on exploits. Most mistakes happened between similar categories. For example, fuzzers were often confused with exploits and normal traffic because fuzzing generates packet sizes that look like normal browsing or exploit attempts.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.98\columnwidth]{ensemble_size_convergence.pdf}
+\includegraphics[width=0.90\textwidth]{ensemble_size_convergence.pdf}
 \caption{Convergence of Out-of-Bag and Test Accuracy Alongside Computational Training Duration Across Estimator Counts ($B$)}
 \label{fig:ensemble_convergence}
-\end{figure}
+\end{figure*}
 
 \subsection{Ensemble Size Convergence and Out-of-Bag Validation}
 

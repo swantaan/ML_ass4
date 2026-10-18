@@ -83,17 +83,19 @@ def plot_confusion_matrix(
     else:
         display_data = cm.astype(np.float32)
 
-    fig, ax = plt.subplots(figsize=(3.5, 3.3))
+    fig, ax = plt.subplots(figsize=(3.5, 3.4))
     annot_labels = np.empty_like(display_data, dtype=object)
     for i in range(n_classes):
         for j in range(n_classes):
             val = display_data[i, j]
-            if val >= 1.0:
+            if val >= 10.0:
+                annot_labels[i, j] = f"{val:.0f}"
+            elif val >= 1.0:
                 annot_labels[i, j] = f"{val:.1f}"
-            elif val > 0.0:
+            elif val >= 0.05:
                 annot_labels[i, j] = f"{val:.1f}"
             else:
-                annot_labels[i, j] = "0"
+                annot_labels[i, j] = ""
 
     sns.heatmap(
         display_data,
@@ -103,19 +105,19 @@ def plot_confusion_matrix(
         xticklabels=class_names,
         yticklabels=class_names,
         cbar=True,
-        cbar_kws={"shrink": 0.82, "label": "Recall (%)"},
+        cbar_kws={"shrink": 0.85, "label": "Recall (%)", "pad": 0.02},
         linewidths=0.3,
-        linecolor="#dddddd",
-        annot_kws={"size": 6.8, "family": "serif"},
+        linecolor="#cccccc",
+        annot_kws={"size": 8.0, "family": "serif"},
         ax=ax,
     )
 
-    ax.set_xlabel("Predicted Label", fontweight="bold", fontsize=9.5, labelpad=4)
-    ax.set_ylabel("True Label", fontweight="bold", fontsize=9.5, labelpad=4)
-    ax.tick_params(axis="both", labelsize=8)
+    ax.set_xlabel("Predicted Label", fontweight="bold", fontsize=9.5, labelpad=3)
+    ax.set_ylabel("True Label", fontweight="bold", fontsize=9.5, labelpad=3)
+    ax.tick_params(axis="both", labelsize=8.5)
     plt.xticks(rotation=45, ha="right")
     plt.yticks(rotation=0)
-    plt.tight_layout(pad=0.3)
+    plt.tight_layout(pad=0.2)
 
     if filepath:
         save_figure(fig, filepath)
