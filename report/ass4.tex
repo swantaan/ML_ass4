@@ -165,7 +165,7 @@ The $k$-nearest neighbours baseline performed poorly, with only 65.13\% accuracy
 
 Looking at speed, $k$-nearest neighbours requires no training, but took 3.36 seconds to test only 15\,000 rows. The random forest took 113.62 seconds to train 30 trees, but classified all 51\,534 test rows in 20.22 seconds. That is under 0.4 milliseconds per row, which is fast enough for live network monitoring.
 
-Figure~\ref{fig:confusion_matrix} shows the confusion matrix for the random forest. The model is very accurate on common classes: 92.4\% on normal traffic, 96.8\% on generic attacks, and 74.2\% on exploits. Most mistakes happened between similar categories. For example, fuzzers were often confused with exploits and normal traffic because fuzzing generates packet sizes that look like normal browsing or exploit attempts.
+Figure~\ref{fig:confusion_matrix} shows the confusion matrix for the random forest. The model is very accurate on common classes: 95.4\% on normal traffic, 97.5\% on generic attacks, and 95.2\% on exploits. In contrast, fuzzers achieve 46.0\% recall, with 40.0\% misclassified as normal traffic and 13.1\% as exploits, because automated fuzzing sequences generate varied packet lengths and header configurations that closely mimic benign browsing sessions and exploit probes.
 
 \begin{figure*}[t]
 \centering
@@ -224,16 +224,17 @@ Comparing split rules showed that Gini impurity and entropy gave nearly identica
 
 Figure~\ref{fig:feature_importance} shows the 15 most important features ranked by mean decrease in impurity.
 
-The top features were destination service connection counts (\texttt{ct\_srv\_dst}, 0.1138), destination port connection rates (\texttt{ct\_src\_dport\_ltm}, 0.1112), source time-to-live (\texttt{sttl}, 0.0998), and destination throughput (\texttt{dload}, 0.0944).
+The top features were network service protocol (\texttt{service}, 0.1234), source time-to-live (\texttt{sttl}, 0.1075), destination port connection count (\texttt{ct\_dst\_sport\_ltm}, 0.0859), source byte volume (\texttt{sbytes}, 0.0680), and state time-to-live ratio (\texttt{ct\_state\_ttl}, 0.0670).
 
-These features match real attack behavior. Connection count features (\texttt{ct\_}) detect rapid port scans and denial-of-service floods, where many connections occur in a short time. Source time-to-live reveals the sender operating system and flags fake IP packets that travel unusual path lengths. High destination download rates separate heavy file downloads and flood attacks from light web traffic.
+These features match real attack behavior. Service identification isolates standard application protocols from attack vectors. Source time-to-live reveals the sender operating system and flags spoofed IP packets that travel anomalous hop counts. Connection count features (\texttt{ct\_}) detect rapid port scans and denial-of-service bursts, while byte counters distinguish data transfers and payload injections from lightweight administrative traffic.
 
 \subsection{Failure Modes and Minority Class Analysis}
 
 Although overall accuracy was 81.93\%, rare attack classes had lower scores. In the dataset, normal traffic has 93\,000 rows, while worms has only 174 rows and backdoors has 2\,329 rows.
 
-Random bootstrap samples often miss rows from rare attack classes. As a result, individual trees rarely create leaves for rare attacks, and the tree favors the majority classes. In Figure~\ref{fig:confusion_matrix}, worms and backdoors were often misclassified as exploits or normal traffic. In real systems, training with balanced samples or creating synthetic examples can help the trees learn rare attacks better.
+Random bootstrap samples often miss rows from rare attack classes. As a result, individual trees rarely create leaves for rare attacks, and the tree favors the majority classes. In Figure~\ref{fig:confusion_matrix}, rare attacks were overwhelmingly misclassified as exploits rather than normal traffic: worms suffered 97.1\% misclassification as exploits (achieving 2.9\% recall), DoS had 92.2\% misclassified as exploits (2.8\% recall), and backdoors had 91.4\% misclassified as exploits (5.2\% recall). Because exploits form a large, diverse attack class, anomalous patterns without distinct minority branches default to exploits. In real systems, training with balanced samples or synthetic examples can help the trees learn rare attacks better.
 
+\balance
 \section{Conclusions}
 
 This project evaluated Breiman's random forest algorithm for network intrusion detection on the UNSW-NB15 dataset, comparing results to a single decision tree and $k$-nearest neighbours.

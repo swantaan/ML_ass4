@@ -88,14 +88,12 @@ def plot_confusion_matrix(
     for i in range(n_classes):
         for j in range(n_classes):
             val = display_data[i, j]
-            if val >= 10.0:
-                annot_labels[i, j] = f"{val:.0f}"
-            elif val >= 1.0:
-                annot_labels[i, j] = f"{val:.1f}"
-            elif val >= 0.05:
-                annot_labels[i, j] = f"{val:.1f}"
+            if not normalize:
+                annot_labels[i, j] = f"{int(val)}"
+            elif val == 0.0 or val < 0.05:
+                annot_labels[i, j] = "0"
             else:
-                annot_labels[i, j] = ""
+                annot_labels[i, j] = f"{val:.1f}"
 
     sns.heatmap(
         display_data,
@@ -108,7 +106,7 @@ def plot_confusion_matrix(
         cbar_kws={"shrink": 0.85, "label": "Recall (%)", "pad": 0.02},
         linewidths=0.3,
         linecolor="#cccccc",
-        annot_kws={"size": 8.0, "family": "serif"},
+        annot_kws={"size": 6.8, "family": "serif"},
         ax=ax,
     )
 
